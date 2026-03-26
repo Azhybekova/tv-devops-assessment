@@ -1,4 +1,4 @@
-name: TV DevOps CI-CD
+name: TurboVets CI-CD
 
 on:
   push:
@@ -11,14 +11,22 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  deploy:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4.2.2
 
-      - name: Configure AWS Credentials
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
@@ -28,26 +36,23 @@ jobs:
       - name: Login to ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Docker Image
-        run: |
-          docker build -t $IMAGE_NAME ./app
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME ./app
 
-      - name: Tag Image
-        run: |
-          docker tag $IMAGE_NAME:latest ${{ secrets.ECR_URI }}:latest
+      - name: Tag Docker image
+        run: docker tag $IMAGE_NAME:latest ${{ secrets.ECR_URI }}:latest
 
-      - name: Push Image
-        run: |
-          docker push ${{ secrets.ECR_URI }}:latest
+      - name: Push Docker image
+        run: docker push ${{ secrets.ECR_URI }}:latest
 
-      - name: Install Node deps for IaC
+      - name: Install IaC deps
         working-directory: ./iac
         run: npm install
 
       - name: Install CDKTF CLI
         run: npm install -g cdktf-cli
 
-      - name: CDKTF Deploy
+      - name: CDKTF synth + deploy
         working-directory: ./iac
         env:
           TF_VAR_aws_region: ${{ env.AWS_REGION }}
