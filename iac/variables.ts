@@ -15,50 +15,50 @@ export interface AppVariables {
 export function createVariables(scope: Construct): AppVariables {
   const awsRegion = new TerraformVariable(scope, "aws_region", {
     type: "string",
-    description: "AWS region for deployment",
     default: "us-east-1",
+    description: "AWS region",
   });
 
   const appName = new TerraformVariable(scope, "app_name", {
     type: "string",
-    description: "Application name",
     default: "tv-devops-app",
+    description: "Application name",
   });
 
   const environment = new TerraformVariable(scope, "environment", {
     type: "string",
-    description: "Deployment environment",
     default: "dev",
+    description: "Environment name",
   });
 
   const containerPort = new TerraformVariable(scope, "container_port", {
     type: "number",
-    description: "Container port exposed by the app",
     default: 3000,
+    description: "Container port",
   });
 
   const desiredCount = new TerraformVariable(scope, "desired_count", {
     type: "number",
-    description: "Desired number of ECS tasks",
     default: 1,
+    description: "Desired ECS task count",
   });
 
   const cpu = new TerraformVariable(scope, "cpu", {
     type: "number",
-    description: "Fargate task CPU units",
     default: 256,
+    description: "Task CPU",
   });
 
   const memory = new TerraformVariable(scope, "memory", {
     type: "number",
-    description: "Fargate task memory in MiB",
     default: 512,
+    description: "Task memory",
   });
 
   const imageTag = new TerraformVariable(scope, "image_tag", {
     type: "string",
-    description: "Docker image tag to deploy",
     default: "latest",
+    description: "Docker image tag",
   });
 
   return {
