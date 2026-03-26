@@ -1,4 +1,4 @@
-import { App, TerraformStack } from "cdktf";
+import { App, TerraformStack, S3Backend } from "cdktf";
 import { Construct } from "constructs";
 
 import { AwsProvider } from "@cdktf/provider-aws/lib/provider";
@@ -23,6 +23,21 @@ class DevOpsStack extends TerraformStack {
     super(scope, id);
 
     const vars = createVariables(this);
+
+    const stateBucket = process.env.TF_STATE_BUCKET;
+    const lockTable = process.env.TF_LOCK_TABLE;
+
+    if (!stateBucket || !lockTable) {
+      throw new Error("TF_STATE_BUCKET and TF_LOCK_TABLE must be set");
+    }
+
+    new S3Backend(this, {
+      bucket: stateBucket,
+      key: `tv-devops/${vars.environment.stringValue}/terraform.tfstate`,
+      region: vars.awsRegion.stringValue,
+      dynamodbTable: lockTable,
+      encrypt: true,
+    });
 
     new AwsProvider(this, "aws", {
       region: vars.awsRegion.stringValue,
