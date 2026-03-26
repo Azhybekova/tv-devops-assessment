@@ -26,6 +26,7 @@ class DevOpsStack extends TerraformStack {
 
     const stateBucket = process.env.TF_STATE_BUCKET;
     const lockTable = process.env.TF_LOCK_TABLE;
+    const awsRegion = process.env.AWS_REGION || "us-east-1";
 
     if (!stateBucket || !lockTable) {
       throw new Error("TF_STATE_BUCKET and TF_LOCK_TABLE must be set");
@@ -34,7 +35,7 @@ class DevOpsStack extends TerraformStack {
     new S3Backend(this, {
       bucket: stateBucket,
       key: `tv-devops/${vars.environment.stringValue}/terraform.tfstate`,
-      region: vars.awsRegion.stringValue,
+      region: awsRegion,
       dynamodbTable: lockTable,
       encrypt: true,
     });
