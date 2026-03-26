@@ -37,7 +37,7 @@ docker compose up --build
 Test endpoint
 
 Open in browser:
-http://localhost:3000/health
+http://52.90.175.25:3000/health
 
 Expected response:
 {"status":"ok"}
@@ -66,7 +66,7 @@ Builds Docker image
 Pushes image to Amazon ECR
 Deploys infrastructure using CDKTF
 Required GitHub Secrets
-AWS_ACCESS_KEY
+AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 ECR_URI
 TF_STATE_BUCKET
