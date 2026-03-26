@@ -1,11 +1,20 @@
 {
-  "name": "tv-devops-app",
-  "version": "1.0.0",
-  "main": "src/server.js",
+  "name": "tv-devops-iac",
+  "private": true,
   "scripts": {
-    "start": "node src/server.js"
+    "get": "cdktf get",
+    "synth": "cdktf synth",
+    "deploy": "cdktf deploy --auto-approve",
+    "destroy": "cdktf destroy --auto-approve"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "cdktf": "latest",
+    "constructs": "latest",
+    "@cdktf/provider-aws": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "ts-node": "latest",
+    "@types/node": "latest"
   }
 }

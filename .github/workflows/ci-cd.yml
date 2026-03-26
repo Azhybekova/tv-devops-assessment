@@ -45,18 +45,17 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.ECR_URI }}:latest
 
-      - name: Install IaC deps
+      - name: Install IaC dependencies
         working-directory: ./iac
         run: npm install
 
-      - name: Install CDKTF CLI
-        run: npm install -g cdktf-cli
+      - name: Generate CDKTF providers
+        working-directory: ./iac
+        run: npx cdktf get
 
-      - name: CDKTF synth + deploy
+      - name: Deploy infrastructure
         working-directory: ./iac
         env:
           TF_VAR_aws_region: ${{ env.AWS_REGION }}
           TF_VAR_image_tag: latest
-        run: |
-          cdktf get
-          cdktf deploy --auto-approve
+        run: npx cdktf deploy --auto-approve
