@@ -2,8 +2,7 @@ import { App, TerraformStack } from "cdktf";
 import { Construct } from "constructs";
 
 import { AwsProvider } from "@cdktf/provider-aws/lib/provider";
-import { DataAwsCallerIdentity } from "@cdktf/provider-aws/lib/data-aws-caller-identity";
-import { EcrRepository } from "@cdktf/provider-aws/lib/ecr-repository";
+import { DataAwsEcrRepository } from "@cdktf/provider-aws/lib/data-aws-ecr-repository";
 import { Vpc } from "@cdktf/provider-aws/lib/vpc";
 import { Subnet } from "@cdktf/provider-aws/lib/subnet";
 import { InternetGateway } from "@cdktf/provider-aws/lib/internet-gateway";
@@ -29,12 +28,8 @@ class DevOpsStack extends TerraformStack {
       region: vars.awsRegion.stringValue,
     });
 
-    const caller = new DataAwsCallerIdentity(this, "current", {});
-
-    const ecrRepo = new EcrRepository(this, "ecrRepo", {
+    const ecrRepo = new DataAwsEcrRepository(this, "ecrRepo", {
       name: `${vars.appName.stringValue}-${vars.environment.stringValue}`,
-      imageTagMutability: "MUTABLE",
-      forceDelete: true,
     });
 
     const vpc = new Vpc(this, "vpc", {
@@ -115,6 +110,9 @@ class DevOpsStack extends TerraformStack {
           cidrBlocks: ["0.0.0.0/0"],
         },
       ],
+      tags: {
+        Name: `${vars.appName.stringValue}-${vars.environment.stringValue}-sg`,
+      },
     });
 
     const ecsCluster = new EcsCluster(this, "ecsCluster", {
@@ -159,7 +157,7 @@ class DevOpsStack extends TerraformStack {
       }),
     });
 
-    const imageUri = `${caller.accountId}.dkr.ecr.${vars.awsRegion.stringValue}.amazonaws.com/${ecrRepo.name}:${vars.imageTag.stringValue}`;
+    const imageUri = `${ecrRepo.repositoryUrl}:${vars.imageTag.stringValue}`;
 
     const taskDefinition = new EcsTaskDefinition(this, "taskDefinition", {
       family: `${vars.appName.stringValue}-${vars.environment.stringValue}`,
