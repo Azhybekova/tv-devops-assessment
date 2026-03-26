@@ -79,7 +79,7 @@ npx cdktf deploy --auto-approve
 Public Endpoint
 
 The application is deployed and accessible at:
-http://<PUBLIC_IP>:3000/health
+http://52.90.175.25:3000/health
 
 Destroy Infrastructure
 cd iac
